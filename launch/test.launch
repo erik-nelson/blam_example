@@ -1,0 +1,69 @@
+<launch>
+  <!-- True for simulation, false for real-time and bagfiles -->
+  <param name="/use_sim_time" value="false"/>
+  <arg name="enable_octomap" default="false"/>
+
+  <node pkg="rosbag"
+        name="rosbag"
+        type="play"
+        output="screen"
+        args="/home/eanelson/Desktop/nsh_indoor_outdoor.bag"/>
+
+  <group ns="prism">
+    <!-- SLAM -->
+    <node pkg="prism_slam"
+          name="prism_slam"
+          type="prism_slam_node"
+          output="screen">
+
+      <!-- Topics -->
+      <remap from="~pcld" to="/velodyne_points"/>
+
+      <!-- Initial pose -->
+      <rosparam param="init">
+        position: {x: 0.0, y: 0.0, z: 0.0}
+        orientation: {roll: 0.0, pitch: 0.0, yaw: 0.0}
+      </rosparam>
+
+      <!-- Rates -->
+      <rosparam file="$(find prism_example)/config/prism_rates.yaml"/>
+
+      <!-- Frames -->
+      <rosparam file="$(find prism_example)/config/prism_frames.yaml"/>
+
+      <!-- Point cloud filter -->
+      <rosparam file="$(find point_cloud_filter)/config/parameters.yaml"/>
+
+      <!-- Point cloud odometry -->
+      <rosparam file="$(find point_cloud_odometry)/config/parameters.yaml"/>
+
+      <!-- Point cloud localization -->
+      <rosparam file="$(find point_cloud_localization)/config/parameters.yaml"/>
+
+      <!-- Point cloud mapper -->
+      <rosparam file="$(find point_cloud_mapper)/config/parameters.yaml"/>
+
+      <!-- Point cloud visualization -->
+      <rosparam file="$(find point_cloud_visualizer)/config/parameters.yaml"/>
+    </node>
+
+    <group if="$(arg enable_octomap)">
+
+      <!-- Octomap Server -->
+      <node pkg="octomap_server"
+        name="octomap_server"
+        type="octomap_server_node"
+        output="screen">
+
+        <!-- Topics -->
+        <remap from="cloud_in" to="/prism/prism_slam/odometry_frame_point_cloud"/>
+
+        <!-- Octomap parameters -->
+        <rosparam file="$(find prism_example)/config/prism_octree.yaml"/>
+      </node>
+
+    </group>
+
+  </group>
+
+</launch>
