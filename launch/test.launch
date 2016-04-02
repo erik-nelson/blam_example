@@ -1,13 +1,15 @@
 <launch>
   <!-- True for simulation, false for real-time and bagfiles -->
   <param name="/use_sim_time" value="false"/>
-  <arg name="enable_octomap" default="false"/>
+  <arg name="enable_octomap" default="true"/>
+
 
   <node pkg="rosbag"
         name="rosbag"
         type="play"
         output="screen"
-        args="/home/eanelson/Desktop/nsh_indoor_outdoor.bag"/>
+        args="-r 0.2 /home/eanelson/Desktop/nsh_indoor_outdoor.bag"/>
+
 
   <group ns="prism">
     <!-- SLAM -->
@@ -56,7 +58,7 @@
         output="screen">
 
         <!-- Topics -->
-        <remap from="cloud_in" to="/prism/prism_slam/odometry_frame_point_cloud"/>
+        <remap from="cloud_in" to="/prism/prism_slam/base_frame_point_cloud"/>
 
         <!-- Octomap parameters -->
         <rosparam file="$(find prism_example)/config/prism_octree.yaml"/>
