@@ -7,7 +7,7 @@
 frame_id: world
 
 # Leaf node voxel resolution (meters).
-resolution: 0.5
+resolution: 0.1
 
 sensor_model:
   min_range: 1.0
