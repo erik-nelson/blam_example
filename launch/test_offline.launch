@@ -1,29 +1,29 @@
 <launch>
   <!-- True for simulation, false for real-time and bagfiles -->
   <param name="/use_sim_time" value="false"/>
-  <arg name="enable_octomap" default="true"/>
-
-  <node pkg="rosbag"
-        name="rosbag"
-        type="play"
-        output="screen"
-        args="-r 0.5 /home/eanelson/Desktop/test_lidar.bag"/>
-
+  <arg name="enable_octomap" default="false"/>
 
   <group ns="prism">
     <!-- SLAM -->
     <node pkg="prism_slam"
           name="prism_slam"
-          type="prism_slam_node"
+          type="prism_slam_offline"
           output="screen">
 
-      <!-- Topics -->
-      <remap from="~pcld" to="/velodyne_points"/>
+      <!-- Bagfile parameters -->
+      <param name="filename/bag" value="/Users/eanelson/Desktop/lbl_lidar.bag"/>
+      <param name="scan_topic" value="/velodyne_points"/>
+
+      <param name="time_start" value="0.0"/>
+      <param name="time_end" value="-1.0"/>
+      <param name="time_scale" value="-1.0"/>
 
       <!-- Initial pose -->
       <rosparam param="init">
         position: {x: 0.0, y: 0.0, z: 0.0}
         orientation: {roll: 0.0, pitch: 0.0, yaw: 0.0}
+        position_sigma: {x: 0.1, y: 0.1, z: 0.1}
+        orientation_sigma: {roll: 0.02, pitch: 0.02, yaw: 0.02}
       </rosparam>
 
       <!-- Rates -->
@@ -38,14 +38,14 @@
       <!-- Point cloud odometry -->
       <rosparam file="$(find point_cloud_odometry)/config/parameters.yaml"/>
 
-      <!-- Point cloud localization -->
+      <!-- Loop closure -->
+      <rosparam file="$(find laser_loop_closure)/config/parameters.yaml"/>
+
+      <!-- Localization -->
       <rosparam file="$(find point_cloud_localization)/config/parameters.yaml"/>
 
-      <!-- Point cloud mapper -->
+      <!-- Mapper -->
       <rosparam file="$(find point_cloud_mapper)/config/parameters.yaml"/>
-
-      <!-- Point cloud visualization -->
-      <rosparam file="$(find point_cloud_visualizer)/config/parameters.yaml"/>
     </node>
 
     <group if="$(arg enable_octomap)">
