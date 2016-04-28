@@ -1,14 +1,6 @@
 <launch>
   <!-- True for simulation, false for real-time and bagfiles -->
   <param name="/use_sim_time" value="false"/>
-  <arg name="enable_octomap" default="false"/>
-
-
-  <node pkg="rosbag"
-        name="rosbag"
-        type="play"
-        output="screen"
-        args="-r 0.5 /Users/eanelson/Desktop/lbl_lidar.bag"/>
 
   <group ns="prism">
     <!-- SLAM -->
@@ -52,24 +44,6 @@
       <!-- Loop closure -->
       <rosparam file="$(find laser_loop_closure)/config/parameters.yaml"/>
     </node>
-
-    <group if="$(arg enable_octomap)">
-
-      <!-- Octomap Server -->
-      <node pkg="octomap_server"
-        name="octomap_server"
-        type="octomap_server_node"
-        output="screen">
-
-        <!-- Topics -->
-        <remap from="cloud_in" to="/prism/prism_slam/base_frame_point_cloud"/>
-
-        <!-- Octomap parameters -->
-        <rosparam file="$(find prism_example)/config/prism_octree.yaml"/>
-      </node>
-
-    </group>
-
   </group>
 
 </launch>
